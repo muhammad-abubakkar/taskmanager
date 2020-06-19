@@ -1,15 +1,19 @@
 import {useState} from 'react'
 import ProjectForm from './ProjectForm'
+import { useDispatch } from 'react-redux';
+import {addProject} from '../../store/actions/projectActions'
 
 function AddProject() {
   let [openForm, setOpenForm] = useState(false);
+
+  let dispatch = useDispatch()
 
   const handleCancel = e => setOpenForm(false);
 
   const handleAddProject = e => setOpenForm(true);
 
   const handleSubmit = project => {
-    console.log(project)
+    dispatch(addProject(project))
     setOpenForm(false)
   }
 

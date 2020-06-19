@@ -1,10 +1,13 @@
+import cn from 'classnames'
 import React, {useState, useRef, useEffect} from 'react'
 
 let newProject = {name: '', url: '', description: ''};
 
 function ProjectForm({project = newProject, onSubmit, onCancel}) {
   let focusRef = useRef();
-  let [state, setState] = useState(project);
+  let [data, setData] = useState(project);
+
+  let [errors, setErrors] = useState({});
 
   useEffect(() => {
     focusRef.current.focus();
@@ -12,18 +15,32 @@ function ProjectForm({project = newProject, onSubmit, onCancel}) {
 
   const handleChange = event => {
     let {name, value} = event.target;
-    setState({...state, [name]: value});
+    setData({...data, [name]: value});
   }
 
   const handleSubmit = event => {
     event.preventDefault();
-    onSubmit(state);
+    setErrors({});
+    let {name, url} = data;
+    if (!name) {
+      setErrors(errors => ({...errors, name: true}))
+    }
+    if (!url) {
+      setErrors(errors => ({...errors, url: true}))
+    }
+    if (!(name && url)) {
+      return;
+    }
+    onSubmit(data);
   }
 
   const handleCancel = e => onCancel()
 
   const labelClasses = 'text-sm font-bold text-gray-600'
   const controlClasses = 'px-2 py-1 w-full outline-none rounded-none border focus:border-blue-600'
+  const errorClasses = 'border-red-600';
+
+  const styles = field => cn(controlClasses, {[errorClasses]: errors[field]})
 
   return (
     <form className="p-5 border bg-gray-100" onSubmit={handleSubmit}>
@@ -32,9 +49,9 @@ function ProjectForm({project = newProject, onSubmit, onCancel}) {
         <input 
           name="name"
           ref={focusRef}
-          value={state.name}
+          value={data.name}
           onChange={handleChange}
-          className={controlClasses}
+          className={styles('name')}
           placeholder="Project Name e.g Example (Website)"
         />
       </div>
@@ -42,9 +59,9 @@ function ProjectForm({project = newProject, onSubmit, onCancel}) {
         <label htmlFor="url" className={labelClasses}>URl:</label>
         <input 
           name="url" 
-          value={state.url}
+          value={data.url}
           onChange={handleChange}
-          className={controlClasses}
+          className={styles('url')}
           placeholder="Project URL e.g https://example.com"
         />
       </div>
@@ -53,9 +70,9 @@ function ProjectForm({project = newProject, onSubmit, onCancel}) {
         <textarea 
           name="description" 
           rows={5}
-          value={state.description}
+          value={data.description}
           onChange={handleChange}
-          className={controlClasses}
+          className={styles('description')}
           placeholder="Any important detail..."
         />
       </div>

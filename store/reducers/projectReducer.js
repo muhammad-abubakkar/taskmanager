@@ -1,24 +1,27 @@
-import {v4 as uuid} from 'uuid'
 import {HYDRATE} from 'next-redux-wrapper'
-import {createActions, handleActions} from 'redux-actions'
-
-const {ADD_PROJECT, UPDATE_PROJECT, REMOVE_PROJECT} = createActions(
-  {
-    'ADD_PROJECT': project => ({...project, id: uuid()})
-  }, 
-  'UPDATE_PROJECT', 'REMOVE_PROJECT'
-);
+import {handleActions} from 'redux-actions'
+import {addProject, updateProject, removeProject} from '../actions/projectActions'
 
 const projectReducer = handleActions({
-  [HYDRATE]: (state, {payload: {projects}}) => [...state, ...projects],
+  [HYDRATE]: (state, {payload: {projects}}) => {
+    // console.log(state, projects)
+    return [/*...state,*/ ...projects]
+  },
 
-  [ADD_PROJECT]: (state, {payload: {project}}) => [...state, project],
+  [addProject]: (state, {payload: {project}}) => [...state, project],
 
-  [UPDATE_PROJECT]: (state, {payload: {project}}) => 
+  [updateProject]: (state, {payload: {project}}) => 
     state.map(oldproject => oldproject.id === project.id ? project: oldproject),
 
-  [REMOVE_PROJECT]: (state, {payload: {id}}) => 
+  [removeProject]: (state, {payload: {id}}) => 
     state.filter(project => project.id !== id)
-}, []);
+}, [
+  {
+    id: 1, 
+    name: 'Example Website', 
+    url: 'https://example.com', 
+    description: 'Best online website anyone has ever visited since the beginning of the internet.'
+  }
+]);
 
 export default projectReducer;

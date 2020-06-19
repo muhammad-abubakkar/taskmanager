@@ -1,9 +1,8 @@
 import Head from 'next/head'
-import ProjectCard from '../components/ProjectCard'
-import ProjectForm from '../components/ProjectForm'
-import AddProject from '../components/AddProject'
+import AddProject from '../components/project/AddProject'
+import ProjectList from '../components/project/ProjectList'
 
-export default function Home() {
+export default function HomePage() {
   return (
     <div>
       <Head>
@@ -20,7 +19,7 @@ export default function Home() {
         <div>
           <AddProject/>
         </div>
-        <ProjectCard/>
+        <ProjectList/>
       </div>
     </div>
   )
