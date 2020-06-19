@@ -1,8 +1,11 @@
+import http from '../http'
 import Head from 'next/head'
 import AddProject from '../components/project/AddProject'
 import ProjectList from '../components/project/ProjectList'
+import { useState } from 'react'
 
-export default function HomePage() {
+export default function HomePage({projects}) {
+  let [results, setResults] = useState(projects)
   return (
     <div>
       <Head>
@@ -19,8 +22,26 @@ export default function HomePage() {
         <div>
           <AddProject/>
         </div>
-        <ProjectList/>
+        <ProjectList projects={results}/>
       </div>
     </div>
   )
+}
+
+export async function getServerSideProps(context) {
+  try {
+    let response = await http.get('/projects')
+    return {
+      props: {
+        projects: response.data.projects
+      }
+    }
+  } catch (e) {
+    console.log(e.message);
+  }
+  return {
+    props: {
+      projects: []
+    }
+  }
 }

@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 
 const Project = mongoose.model('project');
+const Task = mongoose.model('task');
 
 async function get(req, res) {
   try {
     let projects = await Project.find({}, null, {sort: {createdAt: 1}})
+    
     res.json({projects})
   } catch(e) {
     res.status(500).json({message: 'Something went wrong'})
