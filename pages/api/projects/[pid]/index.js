@@ -3,28 +3,36 @@ const mongoose = require('mongoose');
 const Project = mongoose.model('project');
 const Task = mongoose.model('task');
 
-function get(req, res) {
-  Project.findById(req.query.id, function(err, project) {
-    if (err !== null) {
-      res.status(500).json({
-        message: 'Something went wrong'
-      })
-    }
-    Task.find({"projectId": String(project._id)}, function(err, tasks) {
-      res.json({
-        project,
-        tasks
-      })
-    })
-  });
+async function get(req, res) {
+  try {
+    let project = await Project.findById(req.query.pid)
+    let tasks = await Task.find({"projectId": String(project._id)})
+    res.json({project, tasks})
+  } catch(e) {
+    res.status(500).json({message: 'Something went wrong'})
+  }
 }
 
-function put(req, res) {
-  res.json({message: 'Updated'});
+async function put(req, res) {
+  try {
+    let project = await Project.findById(req.query.pid)
+    project.name = req.body.name;
+    project.url = req.body.url;
+    project.description = req.body.description;
+    await project.save();
+    res.json({project});
+  } catch (e) {
+    res.status(500).json({message: 'Something went wrong'})
+  }
 }
 
-function del(req, res) {
-  res.json({message: 'Deleted'});
+async function del(req, res) {
+  try {
+    await Project.deleteOne({_id: req.query.pid});
+    res.json({message: 'Project Deleted'});
+  } catch (e) {
+    res.status(500).json({message: 'Something went wrong'})
+  }
 }
 
 module.exports = function (req, res) {

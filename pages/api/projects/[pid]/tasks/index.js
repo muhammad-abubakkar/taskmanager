@@ -2,31 +2,35 @@ const mongoose = require('mongoose');
 
 const Task = mongoose.model('task');
 
-function get(req, res) {
-  Task.find({projectId: req.query.pid}, function(err, tasks) {
-    if (err !== null) {
-      res.status(500).json({
-        message: 'Something went wrong'
-      })
-    }
-    res.json({
-      tasks,
-    })
-  });
+async function get(req, res) {
+  try {
+    let tasks = await Task.find({projectId: req.query.pid}, null, {sort: {createdAt: 1}})
+    res.json({tasks})
+  } catch(e) {
+    res.status(500).json({message: 'Something went wrong'})
+  }
 }
 
-function post(req, res) {
-  res.json({message: 'Created'});
+async function post(req, res) {
+  let data = new Task(req.body);
+  data.projectId = req.query.pid;
+
+  try {
+    let task = await data.save()
+    res.json({task});
+  } catch(e) {
+    res.status(500).json()
+  }
 }
 
 
 module.exports = function (req, res) {
   switch(req.method) {
     case 'GET':
-      get(req, res); break
+      return  get(req, res); break
     case 'POST':
-      post(req, res); break
+      return post(req, res); break
     default:
-      res.status(405).json({message: 'Method not allowed'})
+      return res.status(405).json({message: 'Method not allowed'})
   }
 }

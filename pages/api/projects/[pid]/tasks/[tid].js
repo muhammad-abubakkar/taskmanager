@@ -2,25 +2,35 @@ const mongoose = require('mongoose');
 
 const Task = mongoose.model('task');
 
-function get(req, res) {
-  Task.findById(req.query.tid, function(err, task) {
-    if (err !== null) {
-      res.status(500).json({
-        message: 'Something went wrong'
-      })
-    }
-    res.json({
-      task
-    })
-  });
+async function get(req, res) {
+  try {
+    let task = await Task.findById(req.query.tid)
+    res.json({task})
+  } catch(e) {
+    res.status(500).json({message: 'Something went wrong'})
+  }
 }
 
-function put(req, res) {
-  res.json({message: 'Updated'});
+async function put(req, res) {
+  try {
+    let task = await Task.findById(req.query.tid)
+    task.title = req.body.title;
+    task.done = req.body.done;
+    task.detail = req.body.detail;
+    await task.save();
+    res.json({task});
+  } catch (e) {
+    res.status(500).json({message: 'Something went wrong'})
+  }
 }
 
-function del(req, res) {
-  res.json({message: 'Deleted'});
+async function del(req, res) {
+  try {
+    await Task.deleteOne({_id: req.query.tid});
+    res.json({message: 'Task Deleted'});
+  } catch (e) {
+    res.status(500).json({message: 'Something went wrong'})
+  }
 }
 
 module.exports = function (req, res) {
